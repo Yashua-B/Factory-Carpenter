@@ -63,8 +63,12 @@ async function renderPortfolioPage(imageData, index, container, animationConfigs
         registerPageForHotspotDiscovery(pageDiv);
         repositionAllHotspots();
         
-        // Attach animations (async)
-        attachAnimationsToPage(pageDiv, imageData.pageNumber, animationConfigs).catch(error => {
+        // Attach animations (check appState if configs weren't passed)
+        const configsToUse = animationConfigs.length > 0 
+            ? animationConfigs 
+            : appState.getAnimationConfigs();
+            
+        attachAnimationsToPage(pageDiv, imageData.pageNumber, configsToUse).catch(error => {
             ErrorHandler.warn(`Error attaching animations to page ${imageData.pageNumber}`, error);
         });
     } catch (error) {

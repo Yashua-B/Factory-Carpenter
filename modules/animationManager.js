@@ -803,6 +803,19 @@ async function attachAnimationsToPage(page, pageNumber, animationConfigs) {
         return;
     }
     
+    // Check if animations already exist for this page (prevent duplicates)
+    // Check both the pageAnimationsMap and DOM to be thorough
+    if (pageAnimationsMap.has(page)) {
+        const existingAnimations = pageAnimationsMap.get(page);
+        if (existingAnimations && existingAnimations.length > 0) {
+            // Animations already registered for this page - skip to prevent duplicates
+            if (CONFIG.DEBUG.ENABLED) {
+                ErrorHandler.log(`Animations already exist for page ${pageNumber}, skipping duplicate attachment`);
+            }
+            return;
+        }
+    }
+    
     // Find the zoomist-image container (where animations should be attached)
     const zoomistImage = page.querySelector(CONFIG.SELECTORS.ZOOMIST_IMAGE);
     const container = zoomistImage || page;
@@ -828,6 +841,65 @@ async function attachAnimationsToPage(page, pageNumber, animationConfigs) {
     // Register page for visibility observation (will start animations when page becomes visible)
     if (animationElements.length > 0) {
         registerPageForAnimationVisibility(page, animationElements);
+    }
+}
+
+/**
+ * Attach animations to all currently rendered pages
+ * Called when animation configs finish loading after pages are already rendered
+ * @param {Array} animationConfigs - Array of animation configs (optional, will use appState if not provided)
+ * @returns {Promise<void>}
+ */
+async function attachAnimationsToAllPages(animationConfigs = null) {
+    // Use provided configs or get from appState
+    const configs = animationConfigs || appState.getAnimationConfigs();
+    
+    if (!configs || configs.length === 0) {
+        return;
+    }
+    
+    // Get all rendered pages from DOM
+    const pages = document.querySelectorAll(CONFIG.SELECTORS.PORTFOLIO_PAGE);
+    
+    if (pages.length === 0) {
+        ErrorHandler.log('No pages found to attach animations to');
+        return;
+    }
+    
+    // Attach animations to each page
+    const attachmentPromises = [];
+    for (const page of pages) {
+        const pageNumberAttr = page.getAttribute('data-page');
+        if (!pageNumberAttr) {
+            continue;
+        }
+        
+        const pageNumber = parseInt(pageNumberAttr, 10);
+        if (isNaN(pageNumber)) {
+            continue;
+        }
+        
+        // Check if page has zoomist-image container (required for animations)
+        const zoomistImage = page.querySelector(CONFIG.SELECTORS.ZOOMIST_IMAGE);
+        if (!zoomistImage) {
+            // Page might still be loading - skip for now
+            // Animations will attach when page finishes rendering via normal flow
+            continue;
+        }
+        
+        // Attach animations to this page
+        attachmentPromises.push(
+            attachAnimationsToPage(page, pageNumber, configs).catch(error => {
+                ErrorHandler.warn(`Error attaching animations to page ${pageNumber}`, error);
+            })
+        );
+    }
+    
+    // Wait for all attachments to complete
+    await Promise.allSettled(attachmentPromises);
+    
+    if (attachmentPromises.length > 0) {
+        ErrorHandler.log(`Attached animations to ${attachmentPromises.length} existing page(s)`);
     }
 }
 

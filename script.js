@@ -107,20 +107,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             return []; // Return empty array as fallback
         });
 
-        // Wait for animation configs (required for page rendering)
-        const animationConfigs = await animationConfigPromise;
-
-        // Start loading pages immediately - don't wait for hotspots
-        // Hotspots will attach when their config loads, even if pages are already rendering
+        // Start loading pages immediately - don't wait for configs
+        // Configs will attach when ready, even if pages are already rendering
         await initializePortfolioPages(
             container,
             (imageData, index, container) => {
                 // renderPortfolioPage is now in modules/pageRenderer.js
-                return renderPortfolioPage(imageData, index, container, animationConfigs);
+                // Pass empty array initially - animations will attach later
+                return renderPortfolioPage(imageData, index, container, []);
             },
             showGlobalLoader,
             hideGlobalLoader
         );
+
+        // Animation configs continue loading in background
+        animationConfigPromise.then((animationConfigs) => {
+            // Store in appState for pages that render later
+            appState.setAnimationConfigs(animationConfigs);
+            
+            // Attach animations to all existing pages
+            attachAnimationsToAllPages(animationConfigs);
+            ErrorHandler.log('Animation configs loaded - animations attached to pages');
+        }).catch(() => {
+            // Already handled in catch above (returns empty array)
+            appState.setAnimationConfigs([]);
+        });
 
         // Hotspot configs continue loading in background
         // They will attach to pages when ready via attachHotspotsToPage() which checks appState

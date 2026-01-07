@@ -31,6 +31,9 @@ class AppState {
         // Loader state
         this.globalLoaderElement = null;
         this.globalLoaderLabel = null;
+        
+        // Animation state
+        this.animationConfigs = [];
     }
 
     // Hotspot methods
@@ -56,6 +59,15 @@ class AppState {
 
     clearHotspotElements() {
         this.hotspotElements = [];
+    }
+
+    // Animation methods
+    getAnimationConfigs() {
+        return this.animationConfigs;
+    }
+
+    setAnimationConfigs(configs) {
+        this.animationConfigs = configs || [];
     }
 
     // Page methods
