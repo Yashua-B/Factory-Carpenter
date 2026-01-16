@@ -129,6 +129,11 @@
             border: 0;
             white-space: nowrap;
         }
+
+        /* Hide download button until loading completes - applies to all devices */
+        .download-pdf-btn {
+            visibility: hidden;
+        }
     </style>
     <!-- Non-critical CSS - Load asynchronously in background -->
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -267,6 +272,15 @@
             <!-- Dynamic content will be inserted here by script.js -->
         </div>
     </main>
+
+    <!-- Download PDF Button -->
+    <a href="images/pdfs/Barzideh%2CJoshua_Portfolio.pdf" 
+       download="Barzideh,Joshua_Portfolio.pdf"
+       class="download-pdf-btn"
+       aria-label="Download portfolio as PDF">
+        <img src="assets/icons/download-icon.svg" alt="Download" class="download-icon">
+        <span class="download-text">Download PDF</span>
+    </a>
 
     <!-- YouTube Modal -->
     <div id="youtube-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="youtube-modal-title">

@@ -56,5 +56,11 @@ function hideGlobalLoader(message) {
     loader.classList.add(CONFIG.LOADER.HIDDEN_CLASS);
     loader.setAttribute('aria-hidden', 'true');
     loader.removeAttribute('aria-busy');
+
+    // Show download button now that loading is complete (works on all devices)
+    const downloadBtn = document.querySelector('.download-pdf-btn');
+    if (downloadBtn) {
+        downloadBtn.style.visibility = 'visible';
+    }
 }
 
