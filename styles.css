@@ -534,8 +534,8 @@ body {
 
 .download-pdf-btn .download-icon {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
 }
 
 .download-pdf-btn .download-text {
@@ -559,8 +559,8 @@ body {
     }
     
     .download-pdf-btn .download-icon {
-        width: 20px;
-        height: 20px;
+        width: 26px;
+        height: 26px;
     }
 }
 
